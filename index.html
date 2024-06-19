@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .upload-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar-fill {
+            display: block;
+            height: 30px;
+            width: 0;
+            background: #4caf50;
+            text-align: center;
+            color: white;
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="upload-container">
+    <h2>Upload Image</h2>
+    <form id="uploadForm">
+        <input type="file" id="image" name="image" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div class="progress-bar">
+        <span class="progress-bar-fill"></span>
+    </div>
+    <div id="message"></div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var formData = new FormData();
+        var imageFile = document.getElementById('image').files[0];
+        formData.append('image', imageFile);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://15.206.190.56/cgi-bin/upload.py', true);
+
+        xhr.upload.onprogress = function (e) {
+            if (e.lengthComputable) {
+                var percentComplete = (e.loaded / e.total) * 100;
+                document.querySelector('.progress-bar-fill').style.width = percentComplete + '%';
+                document.querySelector('.progress-bar-fill').textContent = Math.round(percentComplete) + '%';
+            }
+        };
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                document.getElementById('message').textContent = 'Image uploaded successfully!';
+            } else {
+                document.getElementById('message').textContent = 'An error occurred during the upload.';
+            }
+        };
+
+        xhr.send(formData);
+    });
+</script>
+
+</body>
+</html>
+
